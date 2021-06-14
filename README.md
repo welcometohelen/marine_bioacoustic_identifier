@@ -1,5 +1,4 @@
-# Marine Bioacoustic Identification
-## _Stenella longirostris_
+# Marine Bioacoustic Identification: _Stenella longirostris_
 
 ### Background
 The goal of this project is to create a model that can identify marine mammal presence/absense from passive acoustic monitoring data. The inspiration for this undertaking is that once upon a time I had to do this identification manually; it is the epitome of a task where automation would vastly improve the speed and efficacy of research (not to mention the quality of life of research techs). I have recently been exploring neural nets with dummy datasets, and this struck me as an ideal way to apply these concepts to real world data. My former employer was gracious enough to provide recent data, and eager to see results, as this identification is _still_ done mostly manually by techs and graduate students. 
@@ -13,7 +12,8 @@ Existing MM acoustic identification devices often prioritize whales, whereas the
 </p> 
 
 
-In beginning lit review for this idea I learned that *surprise!* people have been at this for years; since long before I was doing it manually. There is not yet a catch-all program for MM ID in use because of the breadth of environmental nuances, and likely the required computing power. At least that was an obstacle I came up against. This is not a dissertation, so for now it  only scratches the surface of developing an actual research-ready tool. However, it still represents good practice of neural network implementation on real world data, and a reference for further study.
+
+In beginning lit review for this idea I learned unsurprisingly that people have been at this for years; since long before I was doing it manually. There is not yet a catch-all program for MM ID in use because of the breadth of environmental nuances, and likely the required computing power. At least that was an obstacle I came up against. This is not a dissertation, so for now it  only scratches the surface of developing an actual research-ready tool. However, it still represents good practice of neural network implementation on real world data, and a reference for further study.
 
 Ideally, this product will eventually identify spinner clicks and whistles, and/or distinguish different marine mammal species, but the first step tackled here is a spinner presence/absense indicator.
 
@@ -39,8 +39,9 @@ An example spectrogram looks like this to us:
 
 <p align=center>
 <img src='./images/busy_spec.png'>
-<br>Spectrogram containing humpback song and anthropogenic noise <br>
+<br>spectrogram with high spinner activity <br>
 </p> 
+
 
 
 And like this to the CNN:
@@ -49,7 +50,8 @@ And like this to the CNN:
 <br>same same to CNN <br>
 </p>  
 
-See [notebook_00] for more example spectrograms from this dataset and their associated audio.
+
+See [notebook_00](https://github.com/welcometohelen/marine_bioacoustic_identifier/blob/main/notebooks/00_intro_to_spectrograms.ipynb) for more example spectrograms from this dataset and their associated audio.
   
 
 Each spectrogram was scaled to itself by Standard Scaler: the mean was subtracted from each value in the array, and all values were divided by the standard deviation of that array. Arrays were _not_ standardized across the dataset. The theory behind this is that these data span multiple environments, and are impacted by a variety of externalities. If we were trying to classify site, these nuances might be important, but for presence/absence across all environments, we want each spectrogram considered independently. Secondly, scaling across all training data would mean this same scaling would have to be applied to all future datasets. Given that the specific deployment sites for hydrophones will vary over time (but still be in the generally similar Hawaii locale), this could result in one day scaling new data based on parameters (mean, std, etc) that are no longer present.
@@ -112,7 +114,7 @@ vX likely represents the near-maximum recall achievable with this depth of neura
 5. Experiment with different methods of scaling the spectrograms. There are several methods used in relevant literature, including no scaling at all.
 
 
-Despite ample steps to explore locally, the main obstacle to improving a model with these data is increased memory and GPUs. External server options were pursued but still did not allow for fitting the entire dataset at once, let alone increasing CNN depth or complexity.  GPUs were unavailable through multiple providers; and a c5ad.4xlarge instance with AWS repeatedly crashed from OOM while working with this shallow architecture.  With increased computing resources, priority steps include:
+Despite ample steps to explore locally, the main obstacle to improving a model with these data is increased memory and GPUs. External server options were pursued but still did not allow for fitting the entire dataset at once, let alone increasing CNN depth or complexity.  GPUs were unavailable through multiple providers; and a c5ad.4xlarge instance on AWS repeatedly crashed from OOM while working with even this shallow architecture.  With increased computing resources, priority steps include:
 1. Double the number of filters in each conv2d layer of the superior model.
 2. Deepen the NN: related literature points to VGG-19, ResNet-50, and AlexNet as deep-layer NNs that have been employed for marine mammal acoustic tasks with better success
     * There are even keras supported versions of [VGG-19](https://keras.io/api/applications/vgg/) and [ResNet-50](https://keras.io/api/applications/resnet/), but they will require significant tuning and/or gridsearching to tailor to spectrograms. Though not a pre-existing keras architecture, there are also examples of [how to code AlexNet for tensorflow](https://analyticsindiamag.com/hands-on-guide-to-implementing-alexnet-with-keras-for-multi-class-image-classification/).
