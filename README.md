@@ -7,7 +7,7 @@ Marine mammal (MM) acoustic identifiers do exist, but the unique environment of 
 
 Existing MM acoustic identification devices often prioritize whales, whereas the contributing researchers here are interested in the much quieter _Stenella longirostris_, aka spinner dolphins. 
 <p align=center>
-<img src='./images/spinners_ks.jpeg'>
+<img src='./images/spinners_ks.jpeg' width=800>
 <br>Hawaiian spinner dolphins (S. longirostris). Photo by Kawika Singson <br>
 </p> 
 
@@ -38,7 +38,7 @@ CNNs are a go-to for image data, but can also be used for spectrograms. Which is
 An example spectrogram looks like this to us:
 
 <p align=center>
-<img src='./images/busy_spec.png'>
+<img src='./images/busy_spec.png' width=600>
 <br>spectrogram with high spinner activity <br>
 </p> 
 
@@ -46,7 +46,7 @@ An example spectrogram looks like this to us:
 
 And like this to the CNN:
 <p align=center>
-<img src='./images/array.png'>
+<img src='./images/array.png' width=600>
 <br>same same to CNN <br>
 </p>  
 
@@ -76,7 +76,7 @@ Once the superior model was identified through holdout evaluation, this model wa
 Each model version that made it to holdout validation was also trained on data that incorporated augmented spectrograms, which were generated during spectrogram preprocessing. These are referred to as 'masked' spectrograms throughout the code, and consist of randomly placed bands of constant amplitude along both time and frequency axes.
 
 <p align=center>
-<img src='./images/masked_spec.png'>
+<img src='./images/masked_spec.png' width=600>
 </p> 
 
 Data augmentation is a common practice in CNN training. Results from training with and without mask incorporation were saved separately for comparison. For those exposed to masked data, the masked spectrograms were mixed into some (but not all) of the training subsets. Masked spectrograms were created for a random 30% of positive files, and a random 10% of negative files. Thus, this augmentation doubled as a strategy for burgeoning the minority class.
