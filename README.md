@@ -121,7 +121,7 @@ Despite ample steps to explore locally, the main obstacle to improving a model w
 
 
 <p align=center>
-<img src='./images/spinners2_h.jpg' width=400>
+<img src='./images/spinners2_h.jpeg' width=400>
 </p>  
 
 ---
