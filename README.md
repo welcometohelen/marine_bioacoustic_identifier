@@ -136,5 +136,5 @@ Citations
 * [Singh, Neha. 2020.](https://arrow.tudublin.ie/cgi/viewcontent.cgi?article=1222&context=scschcomdis) _Classification of animal sound using convolutional neural network. Masters Dissertation. Technological University Dublin_. DOI:10.21427/7pb8-9409
 * [T.D. 2019.](https://medium.com/@dtuk81/confusion-matrix-visualization-fc31e3f30fea) Confusion Matrix Visualization.
 * [Thomas et al. 2019.](https://ecmlpkdd2019.org/downloads/paper/314.pdf) Marine Mammal Species Classification using CNN and a Novel Acoustic Representation. 
-* Personal correspondence: <*> Lisa Munger <*> Gwen Rathgeber <*> Charles Rice
+* Personal correspondence: <> Lisa Munger <> Gwen Rathgeber <> Charles Rice
 * I did not brush up on correct citation format. Forward all complaints to https://github.com/charles-rice
