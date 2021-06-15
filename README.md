@@ -32,7 +32,7 @@ This project utilizes librosa for manipulating audio data, and tensorflow and ke
 #### Data
 Data were provided by [Oceanwide Science Institute](http://oceanwidescience.org/) (OSI). Data comprise ~1TB of recordings from nine sites around the Hawaiian Islands, and 11 different deployments. Site depths range from 12-70m, and deployment duration ranges from 52-62 days. All deployments took place in 2016, spanning nine months of the year (no data from April, May, and December). Sample rates were either 50KHz or 64KHz. Most spinner dolphin vocalizations (whistles) are captured in the 12-25 KHz frequency band, while their clicks are broadband.
 
-CNNs are a go-to for image data, but can also be used for spectrograms. Which is a roundabout way of saying _spectrograms are not images_. Spectrograms are matrix representations of audio signals, rendered on axes of time (x), frequency (y), and intensity (color). The sizes of frequency and time bins dictate the resolution of the information, and are dictated by the user-defined parameters of the short time Fourier Transform (STFT). A Fast Fourier Transform (FFT) breaks down a signal into individual spectral components, giving us frequency information. This information applies to the sample as a whole (:30). The STFT divides this longer signal into smaller samples, performs the FFT on each sample, and stitches them together sequentially so we have some semblance of the change in signal over time. The STFT sampling method can be thought of as a sliding window, usually with 50-75% overlap between samples. The specifications used here for generating spectrograms are described in [notebook_02](https://github.com/welcometohelen/marine_bioacoustic_identifier/blob/main/notebooks/02_wav_to_spects.ipynb).
+CNNs are a go-to for image data, but can also be used for spectrograms. Which is a roundabout way of saying _spectrograms are not images_. Spectrograms are matrix representations of audio signals, rendered on axes of time (x), frequency (y), and intensity (color). The sizes of frequency and time bins dictate the resolution of the information, and are dictated by the user-defined parameters of the short time Fourier Transform (STFT). A Fast Fourier Transform (FFT) breaks down a signal into individual spectral components, giving us frequency information. This information applies to the sample as a whole (:30). The STFT divides this longer signal into smaller samples, performs the FFT on each sample, and stitches them together sequentially so we have some semblance of the change in signal over time. The STFT sampling method can be thought of as a sliding window, usually with 50-75% overlap between samples. The specifications used in the STFT are arguably _the_ most important part of data preprocessing for CNN: they determine how the audio is represented to the model, to what resolution, and what features are captured or smoothed over.  The specifications used here for generating spectrograms are described in [notebook_02](https://github.com/welcometohelen/marine_bioacoustic_identifier/blob/main/notebooks/02_wav_to_spects.ipynb).
 
 
 An example spectrogram looks like this to us:
@@ -67,6 +67,16 @@ The entire dataset provided by OSI (11 complete hydrophone deployments) containe
 Once a base CNN was established (ie, converged), hyperparameters were tuned to optimize recall. Recall - aka true positive rate aka sensitivity aka the one with too many aliases - is the priority metric here, because identifying all of the rare dolphin encounters is critical. All versions with remotely competitive recall were saved for final evaluation on a holdout test set.  The parameters of all versions subjected to final testing are described in the figure below. For each of these versions, a model was trained with and without augmented data.
 
 ![](./images/model_progression.png)
+
+
+The 'base' referenced for the convolutional layers was the same across all fittings. It consists of three conv2D layers, all with ReLu activation, formatted as follows:
+
+| Layer | # Filters | Size | Stride | Pooling | pool_size | pool_stride |
+| --- | --- | --- | --- | --- | --- | --- |
+| **1** | 8 | 11 x 11 | 4 x 4 | Max | 3 x 3 | 2 x 2 |
+| **2** | 16 | 5 x 5 | 1 x 1 | Max | 2 x 2 | 2 x 2 |
+| **3** | 16 | 5 x 5 | 1 x 1 | Max | 2 x 2 | 2 x 2 |
+
 
 
 Once the superior model was identified through holdout evaluation, this model was refit 4 times (a total of 5 fits) and average performance was analyzed.  See [notebook_06](https://github.com/welcometohelen/marine_bioacoustic_identifier/blob/main/notebooks/06_holdout_validation.ipynb) for methods and results.
@@ -115,10 +125,10 @@ vX likely represents the near-maximum recall achievable with this depth of neura
 
 
 Despite ample steps to explore locally, the main obstacle to improving a model with these data is increased memory and GPUs. External server options were pursued but still did not allow for fitting the entire dataset at once, let alone increasing CNN depth or complexity.  GPUs were unavailable through multiple providers; and a c5ad.4xlarge instance on AWS repeatedly crashed from OOM while working with even this shallow architecture.  With increased computing resources, priority steps include:
-1. Double the number of filters in each conv2d layer of the superior model.
-2. Deepen the NN: related literature points to VGG-19, ResNet-50, and AlexNet as deep-layer NNs that have been employed for marine mammal acoustic tasks with better success
+1. Double the number of filters in each conv2d layer of the superior model. How much mileage can this architecture get just through increasing filter number?
+2. Reprocess the audio with the desired STFT parameters. It would be very informative to see if and how much higher resolution input _alone_ leads to model improvement, or if the primary area of focus should be model structure.  Specific STFT parameters are recommended at the end of [notebook_02](https://github.com/welcometohelen/marine_bioacoustic_identifier/blob/main/notebooks/02_wav_to_spects.ipynb), but this definitely warrants consulting acousticians for more guidance.
+3. Deepen the NN: related literature points to VGG-19, ResNet-50, and AlexNet as deep-layer NNs that have been employed for marine mammal acoustic tasks with better success
     * There are even keras supported versions of [VGG-19](https://keras.io/api/applications/vgg/) and [ResNet-50](https://keras.io/api/applications/resnet/), but they will require significant tuning and/or gridsearching to tailor to spectrograms. Though not a pre-existing keras architecture, there are also examples of [how to code AlexNet for tensorflow](https://analyticsindiamag.com/hands-on-guide-to-implementing-alexnet-with-keras-for-multi-class-image-classification/).
-3. Explore the specific STFT parameters recommended at the end of [notebook_02](https://github.com/welcometohelen/marine_bioacoustic_identifier/blob/main/notebooks/02_wav_to_spects.ipynb)
 
 
 
@@ -132,6 +142,7 @@ Citations
 * [Daniels Discoveries. 2017](https://danielsdiscoveries.wordpress.com/2017/09/29/spectrogram-input-normalisation-for-neural-networks/) Spectrogram input normalisation for neural networks.
 * [Downey, A.B. 2014](https://greenteapress.com/wp/think-dsp/) Think DSP: Digital Signal Processing in Python. Version 1.1.1. _Green Tea Press_.
 * [Padovese et al. 2021.](https://asa.scitation.org/doi/full/10.1121/10.0004258) Data augmentation for the classification of North Atlantic right whales upcalls. _Journal of the Acoustical Society of America_ 149:4.
+* [S.D. 2019.](https://www.kaggle.com/davids1992/specaugment-quick-implementation) SpecAugment quick implementation. Kaggle.
 * [Shiu et al. 2020.](https://www.nature.com/articles/s41598-020-57549-y) Deep neural networks for automated detection of marine mammal species. _Nature: Scientific Reports_ 10:607.
 * [Singh, Neha. 2020.](https://arrow.tudublin.ie/cgi/viewcontent.cgi?article=1222&context=scschcomdis) _Classification of animal sound using convolutional neural network. Masters Dissertation. Technological University Dublin_. DOI:10.21427/7pb8-9409
 * [T.D. 2019.](https://medium.com/@dtuk81/confusion-matrix-visualization-fc31e3f30fea) Confusion Matrix Visualization.
